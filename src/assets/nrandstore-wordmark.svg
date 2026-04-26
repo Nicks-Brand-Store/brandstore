@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="64" viewBox="0 0 320 64" role="img" aria-label="nrandstore wordmark">
+  <style>
+    .brand { font-family: Inter, Roboto, Helvetica, Arial, sans-serif; font-weight: 800; font-size: 36px; fill: #1F2937; }
+    .tag { font-family: Inter, Roboto, Helvetica, Arial, sans-serif; font-weight: 500; font-size: 12px; fill: #6B7280; }
+  </style>
+  <text class="brand" x="0" y="28">Brand Store</text>
+  <text class="tag" x="0" y="50">modern goods · simple checkout</text>
+</svg>

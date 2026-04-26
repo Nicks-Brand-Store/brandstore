@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="120" viewBox="0 0 400 120" role="img" aria-label="nrandstore logo">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#00C2A8" />
+      <stop offset="100%" stop-color="#006EFA" />
+    </linearGradient>
+    <style>
+      .brand { font-family: Inter, Roboto, Helvetica, Arial, sans-serif; font-weight: 700; font-size: 36px; fill: #1F2937; }
+      .tag { font-family: Inter, Roboto, Helvetica, Arial, sans-serif; font-weight: 500; font-size: 14px; fill: #6B7280; }
+    </style>
+  </defs>
+
+  <!-- Icon -->
+  <g transform="translate(24,24)">
+    <rect x="0" y="0" width="72" height="72" rx="18" fill="url(#g)" />
+    <path d="M18 44C18 44 26 30 36 30C46 30 54 44 54 44" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M24 34c0-4 6-10 12-10 6 0 12 6 12 10" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" transform="translate(0,0)" />
+  </g>
+
+  <!-- Wordmark -->
+  <g transform="translate(120,62)">
+    <text class="brand" x="0" y="12">Brand Store</text>
+    <text class="tag" x="0" y="36">modern goods · simple checkout</text>
+  </g>
+</svg>
