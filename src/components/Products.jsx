@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { products } from '../data/products';
+import { useProducts } from '../context/ProductContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
+import fallbackImage from '../assets/Tshirt.webp';
 
 function Products() {
   const [category, setCategory] = useState('All');
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
+  const { products } = useProducts();
   const { addToCart } = useCart();
   const { addToast } = useToast();
 
@@ -17,7 +19,19 @@ function Products() {
       p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const categories = ['All', ...new Set(products.map((p) => p.category))];
+  // Pagination
+  const [page, setPage] = useState(1);
+  const perPage = 12;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+
+  useEffect(() => {
+    // Reset to first page when filters/search change
+    setPage(1);
+  }, [category, searchQuery, products]);
+
+  const currentProducts = filtered.slice((page - 1) * perPage, page * perPage);
+
+  const categories = ['All', ...new Set(products.map((p) => p.category || 'Misc'))];
 
   return (
     <section>
@@ -39,9 +53,16 @@ function Products() {
       </div>
 
       <div className="product-grid">
-        {filtered.map((product) => (
+        {currentProducts.map((product) => (
           <div key={product.id} className="product-card">
-            <img src={product.images?.[0] || ''} alt={product.name} />
+            <img
+              src={product.images?.[0] || fallbackImage}
+              alt={product.name}
+              onError={(event) => {
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = fallbackImage;
+              }}
+            />
             <h2>{product.name}</h2>
             <p>₹{product.price}</p>
 
@@ -66,6 +87,32 @@ function Products() {
       </div>
 
       {filtered.length === 0 && <p>No products found.</p>}
+
+      {filtered.length > perPage && (
+        <div className="pagination">
+          <button type="button" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
+            Prev
+          </button>
+
+          {Array.from({ length: totalPages }, (_, i) => {
+            const pageNumber = i + 1;
+            return (
+              <button
+                key={pageNumber}
+                className={pageNumber === page ? 'active' : ''}
+                onClick={() => setPage(pageNumber)}
+                type="button"
+              >
+                {pageNumber}
+              </button>
+            );
+          })}
+
+          <button type="button" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}>
+            Next
+          </button>
+        </div>
+      )}
     </section>
   );
 }
