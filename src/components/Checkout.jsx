@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useProducts } from '../context/ProductContext';
+import { useToast } from '../context/ToastContext';
 
 function Checkout() {
-  const { cart, getTotal } = useCart();
+  const { cart, getTotal, clearCart } = useCart();
+  const { products, updateProduct } = useProducts();
+  const { addToast } = useToast();
+  const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', address: '', city: '', zip: '' });
   const [location, setLocation] = useState(null);
 
@@ -20,7 +25,45 @@ function Checkout() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert('Order placed! (This is a demo)');
+
+    if (!form.name || !form.email || !form.address || !form.city || !form.zip) {
+      addToast('Please fill in all fields', { type: 'error' });
+      return;
+    }
+
+    // Update product sales for each item in cart
+    cart.forEach((cartItem) => {
+      const product = products.find((p) => p.id === cartItem.id);
+      if (product) {
+        const updatedSales = (product.sales || 0) + (cartItem.quantity || 1);
+        updateProduct({
+          ...product,
+          sales: updatedSales,
+        });
+      }
+    });
+
+    // Create order record
+    const order = {
+      orderId: `ORD-${Date.now()}`,
+      customer: form,
+      items: cart,
+      total: getTotal(),
+      timestamp: new Date().toISOString(),
+      location,
+    };
+
+    // Store order in localStorage
+    const orders = JSON.parse(localStorage.getItem('brand-store-orders') || '[]');
+    orders.push(order);
+    localStorage.setItem('brand-store-orders', JSON.stringify(orders));
+
+    // Clear cart and show success message
+    clearCart();
+    addToast(`Order placed successfully! Order ID: ${order.orderId}`, { type: 'success' });
+
+    // Redirect to dashboard
+    setTimeout(() => navigate('/dashboard'), 1500);
   };
 
   if (cart.length === 0) return <div className="empty-cart"><p>Cart is empty. <Link to="/products">Shop now</Link></p></div>;

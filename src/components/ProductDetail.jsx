@@ -1,42 +1,66 @@
 import { useParams, Link } from 'react-router-dom';
 import { useState } from 'react';
-import { products } from '../data/products';
+import { useProducts } from '../context/ProductContext';
 import { useCart } from '../context/CartContext';
+import fallbackImage from '../assets/Tshirt.webp';
 
 function ProductDetail() {
   const { id } = useParams();
-  const product = products.find(p => p.id === parseInt(id));
+  const { getProductById } = useProducts();
+  const product = getProductById(id);
   const { addToCart } = useCart();
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState(product?.images?.[0] || fallbackImage);
 
   if (!product) return <div>Product not found</div>;
 
+  const images = product.images?.length ? product.images : [fallbackImage];
+
   return (
-    <div>
-      <header>
+    <div className="product-detail-page">
+      <header className="product-detail-header">
         <h1>{product.name}</h1>
         <nav>
           <Link to="/products">Back to Products</Link> | <Link to="/cart">Cart</Link>
         </nav>
       </header>
-      <main>
-        <div style={{ display: 'flex' }}>
-          <div>
-            {product.images.map((img, i) => (
-              <img key={i} src={img} alt={`${product.name} ${i+1}`} style={{ width: '100px', cursor: 'pointer' }} onClick={() => setSelected(img)} />
+      <main className="product-detail-layout">
+        <section className="product-detail-gallery">
+          <img
+            className="product-detail-main-image"
+            src={selected}
+            alt={`Selected view of ${product.name}`}
+            onError={(event) => {
+              event.currentTarget.onerror = null;
+              event.currentTarget.src = fallbackImage;
+            }}
+          />
+          <div className="product-gallery-thumbs">
+            {images.map((img, i) => (
+              <button
+                key={i}
+                type="button"
+                className={`thumb-button ${selected === img ? 'active' : ''}`}
+                onClick={() => setSelected(img || fallbackImage)}
+              >
+                <img
+                  src={img || fallbackImage}
+                  alt={`${product.name} ${i + 1}`}
+                  onError={(event) => {
+                    event.currentTarget.onerror = null;
+                    event.currentTarget.src = fallbackImage;
+                  }}
+                />
+              </button>
             ))}
           </div>
-          <div>
-            <p>{product.description}</p>
-            <p>Price: ${product.price}</p>
-            <button onClick={() => addToCart(product)}>Add to Cart</button>
-          </div>
-        </div>
-        {selected && (
-          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setSelected(null)}>
-            <img src={selected} alt="Selected" style={{ maxWidth: '80%', maxHeight: '80%' }} />
-          </div>
-        )}
+        </section>
+        <section className="product-detail-info">
+          <p>{product.description}</p>
+          <p className="detail-price">Price: ₹{product.price}</p>
+          <button type="button" className="add-cart-btn full-width" onClick={() => addToCart(product)}>
+            Add to Cart
+          </button>
+        </section>
       </main>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import './HeaderFooter.css';
 import logo from '../assets/nrandstore-logo-dark.svg';
 
@@ -9,6 +10,7 @@ function Header() {
   const [debouncedTerm, setDebouncedTerm] = useState('');
   const navigate = useNavigate();
   const { cart } = useCart();
+  const { user, logout } = useAuth();
 
   // Debounce the search term
   useEffect(() => {
@@ -42,7 +44,21 @@ function Header() {
 
         <nav className="header-nav">
           <Link to="/">Home</Link>
+          <Link to="/products">Products</Link>
           <Link to="/cart">Cart</Link>
+          {user ? (
+            <>
+              <Link to="/dashboard">{user.role === 'admin' ? 'Dashboard' : 'Account'}</Link>
+              <button type="button" className="nav-button" onClick={() => { logout(); navigate('/'); }}>
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login">Login</Link>
+              <Link to="/register">Register</Link>
+            </>
+          )}
         </nav>
 
         <form className="header-search" onSubmit={handleSearchSubmit}>
